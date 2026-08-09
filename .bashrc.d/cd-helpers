@@ -1,0 +1,33 @@
+# cd: wraps builtin cd with pushd, so every directory change is tracked on the
+# dir stack (viewable with `dirs -v`) — and auto-lists the new directory after
+# jumping.
+cd() {
+  builtin pushd "$@" > /dev/null && ls
+}
+
+# cdf: fuzzy-jump to any directory you've visited *this session* via pushd/cd,
+# using fzf against the dir stack (most recent first).
+cdf() {
+  local dir
+  dir=$(dirs -l -p | uniq | fzf) && cd "$dir"
+}
+
+# cdh: fuzzy-jump to any directory from your bash history's past `cd` commands
+# (persists across sessions, unlike cdf which only sees the current stack).
+cdh() {
+  local dir
+  dir=$(history | grep -oP '(?<=cd ).*' | awk '!seen[$0]++' | fzf) && cd "$dir"
+}
+
+# cdd: fuzzy-find any subdirectory under a given root (default: current dir),
+# even ones you've never visited before — then jump to it.
+cdd() {
+  local dir
+  dir=$(find "${1:-.}" -type d 2>/dev/null | fzf) && cd "$dir"
+}
+
+# cdb: plain builtin cd, no pushd tracking, no auto-ls — for quick one-off
+# jumps you don't want cluttering the dir stack.
+cdb() {
+  builtin cd "$@"
+}
