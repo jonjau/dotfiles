@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+SESSION="heureka"
+
+create_session() {
+    local session="$1"
+
+    # Window 1: editor — main-vertical, 3 panes
+    tmux new-session -d -s "$session" -n editor -c "$HOME/2-res/dev/box"
+    tmux send-keys -t "$session:1" 'nvim' Enter
+    tmux split-window -h -t "$session:1" -c "$HOME/2-res/dev/box"
+    tmux split-window -v -t "$session:1" -c "$HOME/2-res/dev/box"
+    tmux select-layout -t "$session:1" main-vertical
+    # pane indices: 1=left(nvim), 2=right-top, 3=right-bottom(current)
+
+    # Window 2: yazi
+    tmux new-window -t "$session" -n yazi -c "$HOME/2-res/dev/box"
+    tmux send-keys -t "$session:2" 'yazi' Enter
+
+    # Window 3: lazygit
+    tmux new-window -t "$session" -n lazygit -c "$HOME/2-res/dev/box/heureka"
+    tmux send-keys -t "$session:3" 'lazygit' Enter
+
+    # Land on editor window, nvim pane
+    tmux select-window -t "$session:1"
+    tmux select-pane -t "$session:1.1"
+}
+
+if [ -n "$TMUX" ]; then
+    # Already inside tmux — switch to the session (create first if needed)
+    if ! tmux has-session -t "$SESSION" 2>/dev/null; then
+        create_session "$SESSION"
+    fi
+    tmux switch-client -t "$SESSION"
+else
+    # Outside tmux — create if needed, then attach
+    if ! tmux has-session -t "$SESSION" 2>/dev/null; then
+        create_session "$SESSION"
+    fi
+    tmux attach-session -t "$SESSION"
+fi
