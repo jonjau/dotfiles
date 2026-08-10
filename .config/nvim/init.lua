@@ -33,19 +33,7 @@ vim.o.confirm = true
 -- instead of breaking and starting on the next line as if it was a new line.
 vim.o.breakindent = true
 
--- sync clipboard with wayland clipboard
-vim.g.clipboard = {
-  name = "wl-clipboard",
-  copy = {
-    ["+"] = "wl-copy",
-    ["*"] = "wl-copy",
-  },
-  paste = {
-    ["+"] = "wl-paste --no-newline",
-    ["*"] = "wl-paste --no-newline",
-  },
-  cache_enabled = 0,
-}
+-- sync clipboard with system clipboard
 vim.opt.clipboard = "unnamedplus"
 
 -- KEYMAPS
