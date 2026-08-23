@@ -1,7 +1,7 @@
 git:
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: delta --dark --paging=never --side-by-side
+      command: delta --dark --paging=never --side-by-side
     - colorArg: always
-      pager: delta --dark --paging=never
-    - {}   # cycle to this with | for the plain unstyled diff
+      command: delta --dark --paging=never
+    - type: rawGit

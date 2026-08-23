@@ -111,6 +111,8 @@ vim.pack.add({
   'https://github.com/lewis6991/gitsigns.nvim',
   -- Keybinding popup
   'https://github.com/folke/which-key.nvim',
+  -- base16 colorscheme engine, required by matugen.lua
+  'https://github.com/RRethy/base16-nvim'
 })
 
 require('fzf-lua').setup { fzf_colors = true }
@@ -133,7 +135,9 @@ vim.keymap.set('n', '<leader>hs', require('gitsigns').stage_hunk, { desc = 'Stag
 vim.keymap.set('n', '<leader>hu', require('gitsigns').undo_stage_hunk, { desc = 'Unstage hunk' })
 
 --- gruvbox
-vim.pack.add({ 'https://github.com/ellisonleao/gruvbox.nvim' })
-require('gruvbox').setup({ contrast = 'hard' })
-vim.cmd('colorscheme gruvbox')
+-- vim.pack.add({ 'https://github.com/ellisonleao/gruvbox.nvim' })
+-- require('gruvbox').setup({ contrast = 'hard' })
+-- vim.cmd('colorscheme gruvbox')
 
+local ok, matugen = pcall(require, 'matugen')
+if ok then matugen.setup() end
