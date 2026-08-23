@@ -5,3 +5,32 @@ git:
     - colorArg: always
       command: delta --dark --paging=never
     - type: rawGit
+
+gui:
+  theme:
+    activeBorderColor:
+      - "#a2b08d"
+      - bold
+    inactiveBorderColor:
+      - "#948e74"
+    searchingActiveBorderColor:
+      - "#6e857b"
+      - bold
+    optionsTextColor:
+      - "#a2b08d"
+    selectedLineBgColor:
+      - "#a2b08d"
+    inactiveViewSelectedLineBgColor:
+      - bold
+    cherryPickedCommitFgColor:
+      - "#a2b08d"
+    cherryPickedCommitBgColor:
+      - "#6e857b"
+    markedBaseCommitFgColor:
+      - "#6e857b"
+    markedBaseCommitBgColor:
+      - "#ce7a71"
+    unstagedChangesColor:
+      - "#ce7a71"
+    defaultFgColor:
+      - "#f4f6eb"
