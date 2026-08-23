@@ -1,0 +1,19 @@
+[user]
+	email = 40555491+jonjau@users.noreply.github.com
+	name = Jonathan Jauhari
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true  # use n and N to move between diff sections
+	dark = true      # or light = true, or omit for auto-detection
+[merge]
+	conflictStyle = zdiff3
