@@ -651,6 +651,9 @@ binds {
     Mod+F2 hotkey-overlay-title="Open files: Nautilus" {
         spawn "nautilus";
     }
+    Mod+Y hotkey-overlay-title="Toggle window opacity rule" {
+        toggle-window-rule-opacity;
+    }
 }
 
 layer-rule {
