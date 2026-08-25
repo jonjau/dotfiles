@@ -169,7 +169,7 @@ layout {
 
         // Color of the ring on the active monitor.
         // active-color "#7fc8ff"
-	active-color "wheat"
+        active-color "#a2b08d"
 
         // Color of the ring on inactive monitors.
         //
