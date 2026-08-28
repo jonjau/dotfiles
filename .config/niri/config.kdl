@@ -643,6 +643,7 @@ binds {
     Mod+Space hotkey-overlay-title="Open Noctalia launcher" { spawn-sh "noctalia msg panel-toggle launcher"; }
     Mod+Period hotkey-overlay-title="Open Noctalia session panel" { spawn-sh "noctalia msg panel-toggle session"; }
     Mod+Comma hotkey-overlay-title="Open Noctalia Control Center" { spawn-sh "noctalia msg panel-toggle control-center"; }
+    Mod+Slash hotkey-overlay-title="Lock screen" { spawn-sh "noctalia msg session lock"; }
 
     // personal binds
     Mod+F1 hotkey-overlay-title="Open Browser: Firefox" {
@@ -661,3 +662,5 @@ layer-rule {
     place-within-backdrop true
 }
 
+
+include "noctalia.kdl"
