@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Recreate the heureka layout as niri windows on a dedicated workspace.
+WORKSPACE="heureka"
+DEV_DIR="$HOME/2-res/dev/box"
+
+spawn() {
+    local dir="$1"; shift
+    niri msg action spawn -- foot -D "$dir" "$@"
+}
+
+niri msg action focus-workspace "$WORKSPACE"
+
+spawn "$DEV_DIR"                 bash -c "yazi"
+spawn "$DEV_DIR/heureka"         bash -c "pi; exec bash"
+spawn "$DEV_DIR/heureka-design"  bash -c "nvim ./TODO.md"
+spawn "$DEV_DIR/heureka"         bash -c "git status; exec bash"
+sleep 0.3
+spawn "$DEV_DIR/heureka"         bash -c "lazygit"
+
+niri msg action focus-workspace "$WORKSPACE"

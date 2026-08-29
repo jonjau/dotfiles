@@ -1,0 +1,16 @@
+#!/bin/bash
+# Wrapper: bare 'pi' runs the agent; 'pi <known-cmd>' overrides RUN_CMD;
+# anything else is treated as an instance name with RUN_CMD defaulting to 'pi'.
+
+CMD="pi"
+
+if [[ $# -gt 0 && "$1" != -* ]]; then
+    case "$1" in
+        pi|bash|sh)
+            CMD="$1"
+            shift
+            ;;
+    esac
+fi
+
+exec ~/2-res/dev/box/pi-box/run-pi.sh "$CMD" "$@"
