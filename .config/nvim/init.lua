@@ -37,7 +37,7 @@ vim.o.smartcase = true
 vim.o.cursorline = true -- Highlight the line where the cursor is on.
 vim.o.scrolloff = 10 -- Keep this many screen lines above/below the cursor.
 vim.o.list = true -- Show <tab> and trailing spaces.
-vim.opt.listchars = { trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- If performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s). See `:h 'confirm'`
@@ -145,18 +145,68 @@ vim.pack.add({
 require('fzf-lua').setup { fzf_colors = true }
 require('mini.completion').setup {}
 require('quicker').setup {}
-require('gitsigns').setup {}
+require('gitsigns').setup {
+  on_attach = function(bufnr)
+    local gitsigns = require('gitsigns')
+    local function map(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+    -- Navigation
+    map('n', ']c', function()
+      if vim.wo.diff then
+        vim.cmd.normal({']c', bang = true})
+      else
+        gitsigns.nav_hunk('next')
+      end
+    end, { desc = 'Next Hunk' })
+    map('n', '[c', function()
+      if vim.wo.diff then
+        vim.cmd.normal({'[c', bang = true})
+      else
+        gitsigns.nav_hunk('prev')
+      end
+    end, { desc = 'Prev Hunk' })
+    -- Actions
+    map('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage' })
+    map('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset' })
+    map('v', '<leader>hs', function()
+      gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    end, { desc = '[H]unk [S]tage (selection)' })
+    map('v', '<leader>hr', function()
+      gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    end, { desc = '[H]unk [R]eset (selection)' })
+    map('n', '<leader>hS', gitsigns.stage_buffer, { desc = '[H]unk [S]tage Buffer' })
+    map('n', '<leader>hR', gitsigns.reset_buffer, { desc = '[H]unk [R]eset Buffer' })
+    map('n', '<leader>hp', gitsigns.preview_hunk, { desc = '[H]unk [P]review (popup)' })
+    map('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = '[H]unk [I]nline Preview' })
+    map('n', '<leader>hb', function()
+      gitsigns.blame_line({ full = true })
+    end, { desc = '[H]unk [B]lame Line (full)' })
+    map('n', '<leader>hd', gitsigns.diffthis, { desc = '[H]unk [D]iff Against Index' })
+    map('n', '<leader>hD', function()
+      gitsigns.diffthis('~')
+    end, { desc = '[H]unk [D]iff Against Last Commit' })
+    map('n', '<leader>hQ', function() gitsigns.setqflist('all') end, { desc = '[H]unk [Q]uickfix (all buffers)' })
+    map('n', '<leader>hq', gitsigns.setqflist, { desc = '[H]unk [Q]uickfix (buffer)' })
+    -- Toggles
+    map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle Current Line [B]lame' })
+    map('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = '[T]oggle [W]ord Diff' })
+  end
+}
+
 require('which-key').setup {
-    -- Delay between pressing a key and opening which-key (milliseconds)
-    delay = 200,
-    icons = { mappings = vim.g.have_nerd_font },
-    spec = {
-      { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
-      { '<leader>t', group = '[T]oggle' },
-      { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
-      { 'gr', group = 'LSP Actions', mode = { 'n' } },
-      { '<leader>c', group = '[C]ode' },
-    }
+  -- Delay between pressing a key and opening which-key (milliseconds)
+  delay = 200,
+  icons = { mappings = vim.g.have_nerd_font },
+  spec = {
+    { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
+    { '<leader>t', group = '[T]oggle' },
+    { '<leader>h', group = 'Git [H]unk' },
+    { 'gr', group = 'LSP Actions', mode = { 'n' } },
+    { '<leader>c', group = '[C]ode' },
+  }
 }
 require('tree-sitter-manager').setup({
   auto_install = true,
