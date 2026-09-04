@@ -79,9 +79,23 @@ vim.keymap.set({ 'n' }, '<A-l>', '<C-w>l')
 -- bounce between last 2 buffers
 vim.keymap.set("n", "<leader><leader>", "<C-^>", { desc = "Toggle alternate buffer" })
 
-vim.keymap.set('n', '<leader>x', '<Cmd>bd<CR>', { desc = 'Close buffer' })
 vim.keymap.set('n', '<leader>`', ':terminal<CR>', { desc = 'Open terminal' })
 vim.keymap.set('n', '<leader>w', '<Cmd>w<CR>', { desc = 'Save' })
+
+-- Buffers
+vim.keymap.set("n", "<leader>bb", "<cmd>buffers<CR>", { desc = "List buffers" })
+vim.keymap.set("n", "<leader>bx", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
+
+-- Windows
+vim.keymap.set("n", "<leader>|", "<cmd>vsplit<CR>", { desc = "Vertical split (|)" })
+vim.keymap.set("n", "<leader>-", "<cmd>split<CR>", { desc = "Horizontal split (-)" })
+vim.keymap.set("n", "<leader>wx", "<C-w>q", { desc = "Close window" })
+vim.keymap.set("n", "<leader>wo", "<C-w>o", { desc = "Only window" })
+vim.keymap.set("n", "<leader>w=", "<C-w>=", { desc = "Equalize windows" })
+
+-- Tabs, gt and gT to go next tab and back
+vim.keymap.set("n", "<leader>tt", "<cmd>tabnew<CR>", { desc = "New tab" })
+vim.keymap.set("n", "<leader>td", "<cmd>tabclose<CR>", { desc = "Close tab" })
 
 -- to appease muscle memory
 vim.keymap.set({ 'n', 'i' }, '<C-s>', '<Cmd>w<CR>', { desc = 'Save' })
@@ -111,6 +125,19 @@ vim.api.nvim_create_user_command('GitBlameLine', function()
   local filename = vim.api.nvim_buf_get_name(0)
   print(vim.system({ 'git', 'blame', '-L', line_number .. ',+1', filename }):wait().stdout)
 end, { desc = 'Print the git blame for the current line' })
+
+-- Delete the swap file for the current buffer
+vim.api.nvim_create_user_command("SwapDelete", function()
+  local swap = vim.fn.swapname(vim.api.nvim_get_current_buf())
+
+  if swap == "" then
+    vim.notify("No swap file", vim.log.levels.INFO)
+    return
+  end
+
+  vim.fn.delete(swap)
+  vim.notify("Deleted swap file: " .. swap)
+end, {})
 
 -- PLUGINS
 --
@@ -144,6 +171,8 @@ vim.pack.add({
   'https://github.com/stevearc/oil.nvim',
   -- icons
   'https://github.com/nvim-mini/mini.icons',
+  -- lazygit integration
+  'https://github.com/kdheepak/lazygit.nvim',
 })
 
 require('fzf-lua').setup { fzf_colors = true }
@@ -210,6 +239,9 @@ require('which-key').setup {
     { '<leader>h', group = 'Git [H]unk' },
     { 'gr', group = 'LSP Actions', mode = { 'n' } },
     { '<leader>c', group = '[C]ode' },
+    { "<leader>b", group = "Buffers" },
+    { "<leader>w", group = "Windows" },
+    { "<leader>t", group = "Tabs" },
   }
 }
 require('tree-sitter-manager').setup({
@@ -371,7 +403,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- oil
 local oil = require('oil')
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
-vim.keymap.set('n', '<leader>-', function() oil.open_float() end, { desc = 'Open parent directory (float)' })
 vim.keymap.set('n', '<leader>oo', function()
   vim.ui.input({ prompt = 'Path: ' }, function(path)
     if path and path ~= '' then oil.open(path) end
@@ -379,3 +410,13 @@ vim.keymap.set('n', '<leader>oo', function()
 end, { desc = '[O]il [O]pen path' })
 vim.keymap.set('n', '<C-j>', 'j', { desc = 'Move down' })
 vim.keymap.set('n', '<C-k>', 'k', { desc = 'Move up' })
+
+
+-- lazygit
+vim.g.lazygit_floating_window_winblend = 0
+vim.g.lazygit_floating_window_scaling_factor = 0.95
+vim.g.lazygit_floating_window_border_chars = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
+vim.g.lazygit_use_neovim_remote = 1 -- lets lazygit's internal editor invocations open in your existing nvim instance
+vim.keymap.set('n', '<leader>gg', '<Cmd>LazyGit<CR>', { desc = '[G]it (lazygit)' })
+vim.keymap.set('n', '<leader>gF', '<Cmd>LazyGitFilter<CR>', { desc = '[G]it log [F]ilter (whole repo)' })
+vim.keymap.set('n', '<leader>gc', '<Cmd>LazyGitFilterCurrentFile<CR>', { desc = '[G]it log for [C]urrent file' })
