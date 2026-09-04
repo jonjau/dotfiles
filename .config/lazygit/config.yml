@@ -1,10 +1,13 @@
 git:
-  diffRenderers:
+  pagers:
     - colorArg: always
-      command: delta --dark --paging=never --side-by-side
+      pager: delta --dark --paging=never --side-by-side
     - colorArg: always
-      command: delta --dark --paging=never
+      pager: delta --dark --paging=never
     - type: rawGit
+
+os:
+  editPreset: 'nvim-remote'
 
 gui:
   theme:
@@ -19,7 +22,7 @@ gui:
     optionsTextColor:
       - "#a2b08d"
     selectedLineBgColor:
-      - "#a2b08d"
+      - "#2f322c"
     inactiveViewSelectedLineBgColor:
       - bold
     cherryPickedCommitFgColor:
