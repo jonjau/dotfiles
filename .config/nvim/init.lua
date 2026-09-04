@@ -79,12 +79,22 @@ vim.keymap.set({ 'n' }, '<A-l>', '<C-w>l')
 -- bounce between last 2 buffers
 vim.keymap.set("n", "<leader><leader>", "<C-^>", { desc = "Toggle alternate buffer" })
 
-vim.keymap.set('n', '<leader>`', ':terminal<CR>', { desc = 'Open terminal' })
-vim.keymap.set('n', '<leader>w', '<Cmd>w<CR>', { desc = 'Save' })
+vim.keymap.set('n', '<leader>`', function()
+  vim.cmd('tabnew')
+  vim.cmd('terminal')
+  vim.cmd('startinsert')
+end, { desc = 'Open terminal (new tab)' })
+
+vim.keymap.set('n', '<leader>gg', function()
+  vim.cmd('tabnew')
+  vim.cmd('terminal lazygit')
+  vim.cmd('startinsert')
+end, { desc = '[G]it (lazygit, new tab)' })
 
 -- Buffers
 vim.keymap.set("n", "<leader>bb", "<cmd>buffers<CR>", { desc = "List buffers" })
 vim.keymap.set("n", "<leader>bx", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
+vim.keymap.set("n", "<leader>bd", "<cmd>SwapDelete<CR>", { desc = "Delete swap file for current buffer" })
 
 -- Windows
 vim.keymap.set("n", "<leader>|", "<cmd>vsplit<CR>", { desc = "Vertical split (|)" })
@@ -171,8 +181,6 @@ vim.pack.add({
   'https://github.com/stevearc/oil.nvim',
   -- icons
   'https://github.com/nvim-mini/mini.icons',
-  -- lazygit integration
-  'https://github.com/kdheepak/lazygit.nvim',
 })
 
 require('fzf-lua').setup { fzf_colors = true }
@@ -291,6 +299,13 @@ require("oil").setup {
         ['cr'] = { callback = oil_copy('rel_path'),    desc = 'Yank relative path' },
         ['cf'] = { callback = oil_copy('name'),        desc = 'Yank file name' },
         ['cF'] = { callback = oil_copy('name_no_ext'), desc = 'Yank file name (no ext)' },
+        ['<leader>cd'] = {
+          callback = function()
+            local dir = require('oil').get_current_dir()
+            vim.cmd.tcd(dir) -- tab-scoped cwd, see below
+          end,
+          desc = 'Set cwd to current oil directory',
+        },
     }
 }
 
@@ -411,12 +426,3 @@ end, { desc = '[O]il [O]pen path' })
 vim.keymap.set('n', '<C-j>', 'j', { desc = 'Move down' })
 vim.keymap.set('n', '<C-k>', 'k', { desc = 'Move up' })
 
-
--- lazygit
-vim.g.lazygit_floating_window_winblend = 0
-vim.g.lazygit_floating_window_scaling_factor = 0.95
-vim.g.lazygit_floating_window_border_chars = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
-vim.g.lazygit_use_neovim_remote = 1 -- lets lazygit's internal editor invocations open in your existing nvim instance
-vim.keymap.set('n', '<leader>gg', '<Cmd>LazyGit<CR>', { desc = '[G]it (lazygit)' })
-vim.keymap.set('n', '<leader>gF', '<Cmd>LazyGitFilter<CR>', { desc = '[G]it log [F]ilter (whole repo)' })
-vim.keymap.set('n', '<leader>gc', '<Cmd>LazyGitFilterCurrentFile<CR>', { desc = '[G]it log for [C]urrent file' })
