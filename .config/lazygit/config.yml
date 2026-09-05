@@ -7,7 +7,9 @@ git:
     - type: rawGit
 
 os:
-  editPreset: 'nvim-remote'
+  edit: 'nvim --server "$NVIM" --remote "{{filename}}"'
+  editAtLine: 'nvim --server "$NVIM" --remote +{{line}} "{{filename}}"'
+  editAtLineAndWait: 'nvim --server "$NVIM" --remote-wait +{{line}} "{{filename}}"'
 
 gui:
   theme:
