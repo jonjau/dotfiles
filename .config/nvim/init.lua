@@ -60,9 +60,6 @@ vim.o.updatetime = 250
 --
 -- See `:h vim.keymap.set()`, `:h mapping`, `:h keycodes`
 
--- Use <Esc> to exit terminal mode
-vim.keymap.set('t', '<Esc>', '<C-\\><C-n>')
-
 -- Clear highlights on search when pressing <Esc> in normal mode
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
@@ -85,11 +82,21 @@ vim.keymap.set('n', '<leader>`', function()
   vim.cmd('startinsert')
 end, { desc = 'Open terminal (new tab)' })
 
+-- lazygit
 vim.keymap.set('n', '<leader>gg', function()
   vim.cmd('tabnew')
-  vim.cmd('terminal lazygit')
+  vim.fn.jobstart('lazygit', {
+    term = true,
+    cwd = vim.fn.getcwd(),
+    on_exit = function()
+      vim.cmd('bdelete!') -- clean up the terminal buffer when lazygit exits
+    end,
+  })
   vim.cmd('startinsert')
 end, { desc = '[G]it (lazygit, new tab)' })
+
+-- C-q to exit terminal mode, so escape is still for terminal programs
+vim.keymap.set('t', '<C-q>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- Buffers
 vim.keymap.set("n", "<leader>bb", "<cmd>buffers<CR>", { desc = "List buffers" })
@@ -111,6 +118,7 @@ vim.keymap.set("n", "<leader>td", "<cmd>tabclose<CR>", { desc = "Close tab" })
 vim.keymap.set({ 'n', 'i' }, '<C-s>', '<Cmd>w<CR>', { desc = 'Save' })
 vim.keymap.set('n', '<C-z>', 'u', { desc = 'Undo' })
 vim.keymap.set('i', '<C-z>', '<C-o>u', { desc = 'Undo' })
+
 
 -- AUTOCOMMANDS (EVENT HANDLERS)
 --
@@ -303,6 +311,7 @@ require("oil").setup {
           callback = function()
             local dir = require('oil').get_current_dir()
             vim.cmd.tcd(dir) -- tab-scoped cwd, see below
+            vim.notify('tcd: ' .. dir, vim.log.levels.INFO)
           end,
           desc = 'Set cwd to current oil directory',
         },
