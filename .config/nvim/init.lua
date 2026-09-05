@@ -340,12 +340,17 @@ vim.keymap.set('n', '<leader>sk', fzf.keymaps, { desc = '[S]earch [K]eymaps' })
 vim.keymap.set('n', '<leader>sf', fzf.files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>ss', fzf.builtin, { desc = '[S]earch [S]elect fzf-lua' })
 vim.keymap.set('n', '<leader>sw', fzf.grep_cword, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('v', '<leader>sw', fzf.grep_visual, { desc = '[S]earch current [W]ord (selection)' })
+vim.keymap.set('v', '<leader>sw', fzf.grep_visual, { desc = '[S]earch current [W]ords (visual selection)' })
 vim.keymap.set('n', '<leader>sg', fzf.live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sr', fzf.resume, { desc = '[S]earch [R]esume' })
 vim.keymap.set('n', '<leader>so', fzf.oldfiles, { desc = '[S]earch [O]ldfiles (recently opened)' })
-vim.keymap.set('n', '<leader>sc', fzf.commands, { desc = '[S]earch [C]ommands' })
+vim.keymap.set('n', '<leader>sc', fzf.git_commits, { desc = '[S]earch [C]ommits' })
 vim.keymap.set('n', '<leader>sb', fzf.buffers, { desc = '[S]earch existing [B]uffers' })
+vim.keymap.set('n', '<leader>su', fzf.undotree, { desc = '[S]earch [U]ndotree' })
+vim.keymap.set('n', '<leader>sq', fzf.quickfix, { desc = '[S]earch [Q]uickfix list' })
+vim.keymap.set('n', '<leader>sm', fzf.marks, { desc = '[S]earch [M]arks' })
+vim.keymap.set('n', '<leader>sd', fzf.diagnostics_workspace, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>/', fzf.lgrep_curbuf, { desc = 'Fuzzy search in current buffer' })
 
 -- gitsigns
 vim.keymap.set('n', '<leader>hs', require('gitsigns').stage_hunk, { desc = 'Stage hunk' })
@@ -360,6 +365,11 @@ vim.keymap.set('n', '<leader>ct', '<cmd>TSManager<cr>', { desc = '[C]ode [T]rees
 -- typescript
 -- npm install -g typescript-language-server typescript@6
 vim.lsp.enable('ts_ls')
+
+-- Lua
+-- sudo dnf copr enable relativesure/all-packages
+-- sudo dnf install lua-language-server
+vim.lsp.enable('lua_ls')
 
 -- customize the highlight style LSP reference highlighting uses
 vim.api.nvim_set_hl(0, 'LspReferenceText', { link = 'Visual' })
@@ -396,6 +406,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map('<leader>cf', function() vim.lsp.buf.format({ async = true }) end, '[C]ode [F]ormat')
     map('<leader>cd', fzf.diagnostics_document, '[C]ode [D]iagnostics (buffer)')
     map('<leader>cD', fzf.diagnostics_workspace, '[C]ode [D]iagnostics (workspace)')
+    map('<leader>ce', vim.diagnostic.open_float, '[C]ode [E]rror/diagnostic (float)')
 
     -- Inlay hints, only if the server supports it
     if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
@@ -434,4 +445,78 @@ vim.keymap.set('n', '<leader>oo', function()
 end, { desc = '[O]il [O]pen path' })
 vim.keymap.set('n', '<C-j>', 'j', { desc = 'Move down' })
 vim.keymap.set('n', '<C-k>', 'k', { desc = 'Move up' })
+
+-- review git commits
+local function get_git_root(cwd)
+  local result = vim.fn.systemlist(
+    ("git -C %s rev-parse --show-toplevel"):format(vim.fn.shellescape(cwd))
+  )
+  if vim.v.shell_error ~= 0 then
+    return nil
+  end
+  return result[1]
+end
+
+local function review_commit_files()
+  local cwd = vim.fn.getcwd(0)
+  local git_root = get_git_root(cwd)
+
+  if not git_root then
+    vim.notify("Not inside a git repository: " .. cwd, vim.log.levels.WARN)
+    return
+  end
+
+  require("fzf-lua").git_commits({
+    cwd = git_root,
+    actions = {
+      ["default"] = function(selected)
+        local seen = {}
+        local items = {}
+        local hash -- track the (single) commit for base-setting below
+
+        for _, line in ipairs(selected) do
+          hash = line:match("^%S+")
+          local files = vim.fn.systemlist(
+            ("git -C %s show --pretty= --name-only %s"):format(
+              vim.fn.shellescape(git_root), hash
+            )
+          )
+          for _, f in ipairs(files) do
+            local full = git_root .. "/" .. f
+            if not seen[full] then
+              seen[full] = true
+              table.insert(items, {
+                filename = full,
+                lnum = 1,
+                text = hash:sub(1, 7) .. "  " .. f,
+              })
+            end
+          end
+        end
+
+        vim.fn.setqflist({}, " ", { title = "Changed files", items = items })
+        vim.cmd("copen")
+
+        -- point gitsigns at this commit's parent so signs show
+        -- what changed IN the commit, not since it
+        if hash then
+          local ok = require("gitsigns").change_base(hash .. "^", true)
+          if not ok then
+            vim.notify("gitsigns: couldn't set base (root commit?)", vim.log.levels.WARN)
+          end
+        end
+      end,
+    },
+  })
+end
+
+vim.keymap.set("n", "<leader>gc", review_commit_files, { desc = "Git commit files -> quickfix" })
+vim.keymap.set('n', '<leader>gs', fzf.git_status, { desc = '[G]it [S]tatus' })
+vim.keymap.set('n', '<leader>gb', fzf.git_branches, { desc = '[G]it [B]ranches' })
+vim.keymap.set('n', '<leader>gt', fzf.git_stash, { desc = '[G]it s[T]ash' })
+
+vim.keymap.set("n", "<leader>gB", function()
+  require("gitsigns").reset_base(true)
+  vim.notify("gitsigns: base reset to index/HEAD", vim.log.levels.INFO)
+end, { desc = "Gitsigns: reset base" })
 
