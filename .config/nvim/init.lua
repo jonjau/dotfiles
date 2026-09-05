@@ -77,23 +77,18 @@ vim.keymap.set({ 'n' }, '<A-l>', '<C-w>l')
 vim.keymap.set("n", "<leader><leader>", "<C-^>", { desc = "Toggle alternate buffer" })
 
 vim.keymap.set('n', '<leader>`', function()
-  vim.cmd('tabnew')
+  vim.cmd('enew')
   vim.cmd('terminal')
   vim.cmd('startinsert')
-end, { desc = 'Open terminal (new tab)' })
+end, { desc = 'Open terminal (current buffer)' })
 
 -- lazygit
 vim.keymap.set('n', '<leader>gg', function()
-  vim.cmd('tabnew')
-  vim.fn.jobstart('lazygit', {
-    term = true,
-    cwd = vim.fn.getcwd(),
-    on_exit = function()
-      vim.cmd('bdelete!') -- clean up the terminal buffer when lazygit exits
-    end,
-  })
+  vim.cmd('enew')
+  vim.t.tabname = 'lazygit'
+  vim.fn.jobstart('lazygit', { term = true, cwd = vim.fn.getcwd() })
   vim.cmd('startinsert')
-end, { desc = '[G]it (lazygit, new tab)' })
+end, { desc = '[G]it (lazygit, current buffer)' })
 
 -- C-q to exit terminal mode, so escape is still for terminal programs
 vim.keymap.set('t', '<C-q>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
@@ -118,6 +113,31 @@ vim.keymap.set("n", "<leader>td", "<cmd>tabclose<CR>", { desc = "Close tab" })
 vim.keymap.set({ 'n', 'i' }, '<C-s>', '<Cmd>w<CR>', { desc = 'Save' })
 vim.keymap.set('n', '<C-z>', 'u', { desc = 'Undo' })
 vim.keymap.set('i', '<C-z>', '<C-o>u', { desc = 'Undo' })
+
+-- copy reference to line or line range
+local function copy_ref(start_line, end_line)
+    local file = vim.fn.expand("%") -- Use "%:p" for absolute path
+    local reference = (start_line == end_line)
+        and string.format("%s:%d", file, start_line)
+        or string.format("%s:%d:%d", file, start_line, end_line)
+
+    vim.fn.setreg("+", reference)
+    vim.notify("Copied: " .. reference, vim.log.levels.INFO)
+end
+
+vim.keymap.set("n", "<leader>cr", function()
+    local line = vim.fn.line(".")
+    copy_ref(line, line)
+end, { desc = "Copy file path and line number" })
+
+vim.keymap.set("x", "<leader>cr", function()
+    local start_line = vim.fn.line("v")
+    local end_line = vim.fn.line(".")
+    if start_line > end_line then
+        start_line, end_line = end_line, start_line
+    end
+    copy_ref(start_line, end_line)
+end, { desc = "Copy file path and line range" })
 
 
 -- AUTOCOMMANDS (EVENT HANDLERS)
@@ -438,6 +458,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -- oil
 local oil = require('oil')
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+vim.keymap.set('n', '<C-h>', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 vim.keymap.set('n', '<leader>oo', function()
   vim.ui.input({ prompt = 'Path: ' }, function(path)
     if path and path ~= '' then oil.open(path) end
