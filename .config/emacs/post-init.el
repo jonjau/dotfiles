@@ -1,41 +1,5 @@
 ;;; post-init.el --- Post-init.el -*- no-byte-compile: t; lexical-binding: t; -*-
 
-;; Native compilation enhances Emacs performance by converting Elisp code into
-;; native machine code, resulting in faster execution and improved
-;; responsiveness.
-;;
-;; Ensure adding the following compile-angel code at the very beginning
-;; of your `~/.emacs.d/post-init.el` file, before all other packages.
-(use-package compile-angel
-  :demand t
-  :config
-  ;; Set `compile-angel-verbose' to nil to disable compile-angel messages.
-  ;; (When set to nil, compile-angel won't show which file is being compiled.)
-  (setq compile-angel-verbose t)
-
-  ;; The following directive prevents compile-angel from compiling your init
-  ;; files. If you choose to remove this push to `compile-angel-excluded-files'
-  ;; and compile your pre/post-init files, ensure you understand the
-  ;; implications and thoroughly test your code. For example, if you're using
-  ;; the `use-package' macro, you'll need to explicitly add:
-  ;; (eval-when-compile (require 'use-package))
-  ;; at the top of your init file.
-  (push "/init.el" compile-angel-excluded-files)
-  (push "/early-init.el" compile-angel-excluded-files)
-  (push "/pre-init.el" compile-angel-excluded-files)
-  (push "/post-init.el" compile-angel-excluded-files)
-  (push "/pre-early-init.el" compile-angel-excluded-files)
-  (push "/post-early-init.el" compile-angel-excluded-files)
-
-  ;; A local mode that compiles .el files whenever the user saves them.
-  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
-
-  ;; A global mode that compiles .el files prior to loading them via `load' or
-  ;; `require'. Additionally, it compiles all packages that were loaded before
-  ;; the mode `compile-angel-on-load-mode' was activated.
-  (compile-angel-on-load-mode 1))
-
-
 ;; Auto-revert in Emacs is a feature that automatically updates the
 ;; contents of a buffer to reflect changes made to the underlying file
 ;; on disk.
@@ -129,9 +93,210 @@
   (add-hook 'completion-at-point-functions #'cape-file)
   (add-hook 'completion-at-point-functions #'cape-elisp-block))
 
+;; Vertico provides a vertical completion interface, making it easier to
+;; navigate and select from completion candidates (e.g., when `M-x` is pressed).
+(use-package vertico
+  :init
+  ;; (setq vertico-scroll-margin 0) ;; Different scroll margin
+  ;; (setq vertico-count 20) ;; Show more candidates
+  ;; (setq vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+  (vertico-mode 1))
+
+;; Vertico leverages Orderless' flexible matching capabilities, allowing users
+;; to input multiple patterns separated by spaces, which Orderless then
+;; matches in any order against the candidates.
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless basic))
+  (setq completion-category-overrides '((file (styles partial-completion))))
+  ;; Emacs 31: partial-completion behaves like substring
+  (setq completion-pcm-leading-wildcard t))
+
+;; Marginalia allows Embark to offer you preconfigured actions in more contexts.
+;; In addition to that, Marginalia also enhances Vertico by adding rich
+;; annotations to the completion candidates displayed in Vertico's interface.
+(use-package marginalia
+  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+  ;; available in the *Completions* buffer, add it to the
+  ;; `completion-list-mode-map'.
+  :bind (:map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init section is always executed.
+  :init
+
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode 1))
+
+;; Embark integrates with Consult and Vertico to provide context-sensitive
+;; actions and quick access to commands based on the current selection, further
+;; improving user efficiency and workflow within Emacs. Together, they create a
+;; cohesive environment for managing completions and interactions.
+(use-package embark
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  ;; Show the Embark target at point via Eldoc. You may adjust the
+  ;; Eldoc strategy, if you want to see the documentation from
+  ;; multiple providers. Beware that using this can be a little
+  ;; jarring since the message shown in the minibuffer can be more
+  ;; than one line, causing the modeline to move up and down:
+
+  ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+  ;; Add Embark to the mouse context menu. Also enable `context-menu-mode'.
+  ;; (context-menu-mode 1)
+  ;; (add-hook 'context-menu-functions #'embark-context-menu 100)
+
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult)
+
+;; Consult offers a suite of commands for efficient searching, previewing, and
+;; interacting with buffers, file contents, and more, improving various tasks.
+
+(use-package consult
+  ;; Replace bindings. Lazily loaded by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ("C-c r" . consult-recent-file)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g r" . consult-grep-match)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ("M-s c" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Tweak the register preview for `consult-register-load',
+  ;; `consult-register-store' and the built-in commands.  This improves the
+  ;; register formatting, adds thin separator lines, register sorting and hides
+  ;; the window mode line.
+  (advice-add #'register-preview :override #'consult-register-window)
+  (setq register-preview-delay 0.5)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep consult-man
+   consult-bookmark consult-recent-file consult-xref
+   consult-source-bookmark consult-source-file-register
+   consult-source-recent-file consult-source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
+  )
+
+;; The undo-fu package is a lightweight wrapper around Emacs' built-in undo
+;; system, providing more convenient undo/redo functionality.
+(use-package undo-fu
+  :commands (undo-fu-only-undo
+             undo-fu-only-redo
+             undo-fu-only-redo-all
+             undo-fu-disable-checkpoint)
+  :init
+  (global-unset-key (kbd "C-z"))
+  (global-set-key (kbd "C-z") 'undo-fu-only-undo)
+  (global-set-key (kbd "C-S-z") 'undo-fu-only-redo))
+
+;; The undo-fu-session package complements undo-fu by enabling the saving
+;; and restoration of undo history across Emacs sessions, even after restarting.
+(use-package undo-fu-session
+  :init
+  (undo-fu-session-global-mode 1))
 
 ;; Uncomment the following if you are using undo-fu
-;; (setq evil-undo-system 'undo-fu)
+(setq evil-undo-system 'undo-fu)
+
+(let ((inhibit-redisplay t))
+  ;; Disable all active themes
+  (mapc #'disable-theme custom-enabled-themes)
+  ;; Load the built-in theme
+  (load-theme 'noctalia t))
 
 ;; Vim emulation
 (use-package evil
@@ -193,7 +358,6 @@
   :commands (goto-last-change
              goto-last-change-reverse))
 
-
 ;;; Enable automatic insertion and management of matching pairs of characters
 ;;; (e.g., (), {}, "") globally using `electric-pair-mode'.
 (use-package elec-pair
@@ -231,6 +395,12 @@
   (setq which-key-max-description-length 40)
   (which-key-mode 1))
 
+;; Smooth scrolling
+(setq pixel-scroll-precision-use-momentum nil) ; Precise/smoother scrolling
+(pixel-scroll-precision-mode 1)
+
+;; Paren match highlighting
+(show-paren-mode 1)
 
 ;;; Use common keystrokes by default
 ;; ctrl+c ctrl+v etc.
@@ -239,4 +409,74 @@
 ;;; Enable horizontal scrolling
 (setopt mouse-wheel-tilt-scroll t)
 (setopt mouse-wheel-flip-direction t)
+
+(defun my/set-face-font (face)
+  (set-face-attribute face nil
+                       :height 110 :weight 'normal :family "IosevkaTerm NFM"))
+
+;; Customise the default font with specific size and weight
+(mapc #'my/set-face-font
+      '(default fixed-pitch
+        tab-bar tab-bar-tab tab-bar-tab-inactive
+        line-number line-number-current-line))
+
+;; Window dividers separate windows visually. Window dividers are bars that can
+;; be dragged with the mouse, thus allowing you to easily resize adjacent
+;; windows.
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Window-Dividers.html
+(window-divider-mode 1)
+
+;; Constrain vertical cursor movement to lines within the buffer
+(setq dired-movement-style 'bounded-files)
+
+;; Dired buffers: Automatically hide file details (permissions, size,
+;; modification date, etc.) and all the files in the `dired-omit-files' regular
+;; expression for a cleaner display.
+(add-hook 'dired-mode-hook #'dired-hide-details-mode)
+
+;; Hide files from dired
+(setq dired-omit-files (concat "\\`[.]\\'"
+                               "\\|\\(?:\\.js\\)?\\.meta\\'"
+                               "\\|\\.\\(?:elc\\|a\\|o\\|pyc\\|pyo\\|swp\\|class\\)\\'"
+                               "\\|^\\.DS_Store\\'"
+                               "\\|^\\.\\(?:svn\\|git\\)\\'"
+                               "\\|^\\.ccls-cache\\'"
+                               "\\|^__pycache__\\'"
+                               "\\|^\\.project\\(?:ile\\)?\\'"
+                               "\\|^flycheck_.*"
+                               "\\|^flymake_.*"))
+(add-hook 'dired-mode-hook #'dired-omit-mode)
+
+;; dired: Group directories first
+(with-eval-after-load 'dired
+  (let ((args "--group-directories-first -ahlv"))
+    (when (or (eq system-type 'darwin) (eq system-type 'berkeley-unix))
+      (if-let* ((gls (executable-find "gls")))
+          (setq insert-directory-program gls)
+        (setq args nil)))
+    (when args
+      (setq dired-listing-switches args))))
+
+;; Enables visual indication of minibuffer recursion depth after initialization.
+(minibuffer-depth-indicate-mode 1)
+
+;; Configure Emacs to ask for confirmation before exiting
+(setq confirm-kill-emacs 'y-or-n-p)
+
+;; like oil.nvim
+(with-eval-after-load 'evil
+  (evil-define-key 'normal 'global
+    "-" #'dired-jump
+    (kbd "C-h") #'dired-jump))
+
+;; Inside Dired itself, the same two keys instead go UP one directory
+;; level — matching oil's in-buffer "go to parent" behavior once you're
+;; already browsing.
+(with-eval-after-load 'dired
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "-" #'dired-up-directory
+    (kbd "C-h") #'dired-up-directory
+    (kbd "C-j") #'dired-next-line
+    (kbd "C-k") #'dired-previous-line
+    (kbd "C-l") #'dired-find-file))
 

@@ -6,5 +6,5 @@
 (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
 ;;; Enable menu bar
-(setq minimal-emacs-ui-features '(menu-bar))
+; (setq minimal-emacs-ui-features '(menu-bar))
 
