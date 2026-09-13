@@ -10,28 +10,14 @@
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
 
-  ;; Make :s in visual mode operate only on the actual visual selection
-  ;; (character or block), instead of the full lines covered by the selection
-  (setq evil-ex-visual-char-range t)
-  ;; Use Vim-style regular expressions in search and substitute commands,
-  ;; allowing features like \v (very magic), \zs, and \ze for precise matches
-  (setq evil-ex-search-vim-style-regexp t)
-  ;; Enable automatic horizontal split below
-  (setq evil-split-window-below t)
-  ;; Enable automatic vertical split to the right
-  (setq evil-vsplit-window-right t)
   ;; Disable echoing Evil state to avoid replacing eldoc
   (setq evil-echo-state nil)
   ;; Do not move cursor back when exiting insert state
   (setq evil-move-cursor-back nil)
-  ;; Make `v$` exclude the final newline
-  (setq evil-v$-excludes-newline t)
   ;; Enable fine-grained undo behavior
   (setq evil-want-fine-undo t)
   ;; Disable wrapping of search around buffer
   (setq evil-search-wrap nil)
-  ;; Allow C-h to delete in insert state
-  (setq evil-want-C-h-delete t)
   ;; Enable C-u to delete back to indentation in insert state
   (setq evil-want-C-u-delete t)
   ;; Whether Y yanks to the end of the line

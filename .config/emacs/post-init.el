@@ -368,7 +368,7 @@
 
 (defun my/set-face-font (face)
   (set-face-attribute face nil
-                       :height 110 :weight 'normal :family "IosevkaTerm NFM"))
+                       :height 110 :weight 'normal :family "IosevkaTerm Nerd Font Mono"))
 
 ;; Customise the default font with specific size and weight
 (mapc #'my/set-face-font
@@ -437,3 +437,14 @@
     (kbd "C-k") #'dired-previous-line
     (kbd "C-l") #'dired-find-file))
 
+;; Add window margins
+(add-to-list 'default-frame-alist '(internal-border-width . 5))
+
+;; Customise modeline
+(setq-default mode-line-format '(" %+ "
+                                 (:propertize "%b" face mode-line-buffer-id)
+                                 ":%l:%c %[" mode-name "%]"
+                                 (-2 "%n")
+                                 (visual-line-mode " W")
+                                 (auto-fill-function " F")
+                                 (overwrite-mode " O")))
