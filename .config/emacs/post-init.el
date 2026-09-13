@@ -358,6 +358,16 @@
   :commands (goto-last-change
              goto-last-change-reverse))
 
+;;; avy
+(use-package avy
+  :commands (avy-goto-char
+             avy-goto-char-2
+             avy-next)
+  :bind (("C-c j" . avy-goto-line)
+         ("C-c k"   . avy-goto-char-timer)
+         :map isearch-mode-map
+         ("C-c k" . avy-isearch)))
+
 ;;; Enable automatic insertion and management of matching pairs of characters
 ;;; (e.g., (), {}, "") globally using `electric-pair-mode'.
 (use-package elec-pair
@@ -383,6 +393,9 @@
 (dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
   (add-hook hook #'display-line-numbers-mode))
 
+;; Highlight current line when in programming buffers
+(add-hook 'prog-mode-hook #'hl-line-mode)
+
 ;; Set the maximum level of syntax highlighting for Tree-sitter modes
 (setq treesit-font-lock-level 4)
 
@@ -398,6 +411,9 @@
 ;; Smooth scrolling
 (setq pixel-scroll-precision-use-momentum nil) ; Precise/smoother scrolling
 (pixel-scroll-precision-mode 1)
+
+;; Show trailing whitespace
+(setq-default show-trailing-whitespace t)
 
 ;; Paren match highlighting
 (show-paren-mode 1)
@@ -466,8 +482,7 @@
 ;; like oil.nvim
 (with-eval-after-load 'evil
   (evil-define-key 'normal 'global
-    "-" #'dired-jump
-    (kbd "C-h") #'dired-jump))
+    "-" #'dired-jump))
 
 ;; Inside Dired itself, the same two keys instead go UP one directory
 ;; level — matching oil's in-buffer "go to parent" behavior once you're
