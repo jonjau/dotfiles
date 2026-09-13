@@ -420,6 +420,7 @@
 (setq confirm-kill-emacs 'y-or-n-p)
 
 (require 'vim-like)
+(require 'dev)
 
 ;; like oil.nvim
 (with-eval-after-load 'evil
@@ -436,6 +437,7 @@
     (kbd "C-j") #'dired-next-line
     (kbd "C-k") #'dired-previous-line
     (kbd "C-l") #'dired-find-file))
+
 
 ;; Add window margins
 (add-to-list 'default-frame-alist '(internal-border-width . 5))
