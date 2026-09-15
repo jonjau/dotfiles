@@ -89,5 +89,22 @@
 (setq doom-theme 'modus-vivendi)
 
 (setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 16 :weight 'regular)
-      doom-symbol-font (font-spec :family "IosevkaTerm Nerd Font Mono")
       doom-variable-pitch-font (font-spec :family "Liberation Sans" :size 13))
+
+(defun doom-dashboard-draw-ascii-emacs-banner-fn ()
+  (propertize
+   (string-join
+    '("⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⢀⣠⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀"
+      "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠞⠀⠀⠀⣀⣤⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+      "⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠃⣀⣠⡴⠞⠋⠀⠀⠀⠀⠀⠀⠀⠀⣠⠀⢀⠔⠀⠀"
+      "⠀⠀⠀⠀⠀⠀⠀⣀⠄⠻⠛⠋⠉⠀⠀⠀⠀⠀⠀⠰⠚⣿⣆⣾⠁⠠⠿⠶⣶⣦"
+      "⠀⠀⠀⠀⠀⡠⠚⠁⠀⠀⠀⠀⠀⠀⠀⣠⠶⢿⣷⠀⢀⡿⠻⣿⠶⠂⠀⠀⠈⡿"
+      "⠀⠀⢀⡤⠊⠀⠀⠀⠀⠀⠀⣠⢾⣧⠎⠁⢀⡴⠋⠰⠋⢀⣀⣠⣤⡤⠶⠖⠉⠀"
+      "⠀⣠⠟⠁⠀⣠⡴⣃⠀⢀⡜⠁⠞⠁⠀⠀⢁⣠⠴⠚⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀"
+      "⣿⣃⣤⡶⠟⣩⡾⠋⣠⠋⠀⠀⠀⢀⡠⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+      "⠙⠋⠁⢀⣼⠟⢁⡴⠁⠀⠀⠀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+      "⠀⠀⠀⠈⠁⢠⠞⠀⠀⠀⠀⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+      "⠀⠀⠀⠀⡰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀")
+    "\n")
+   'face 'doom-dashboard-banner))
+(setq +dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn)
