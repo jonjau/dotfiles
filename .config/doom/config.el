@@ -86,7 +86,7 @@
 
 ;;; set font
 (add-to-list 'custom-theme-load-path (concat doom-user-dir "themes/"))
-(setq doom-theme 'modus-vivendi)
+(setq doom-theme 'doom-miramare)
 
 (setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 16 :weight 'regular)
       doom-variable-pitch-font (font-spec :family "Liberation Sans" :size 13))
@@ -108,3 +108,15 @@
     "\n")
    'face 'doom-dashboard-banner))
 (setq +dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn)
+
+;;; dired like oil.nvim
+(map! :n "-" #'dired-jump
+      (:leader
+       (:prefix-map ("o" . "open")
+        :desc "Open path in dired" "o"
+        (cmd! (dired (read-directory-name "Path: "))))))
+(map! :map dired-mode-map
+      :n "C-h" #'dired-up-directory
+      :n "C-j" #'evil-next-line
+      :n "C-k" #'evil-previous-line
+      :n "C-l" #'dired-find-file)
