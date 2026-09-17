@@ -120,3 +120,11 @@
       :n "C-j" #'evil-next-line
       :n "C-k" #'evil-previous-line
       :n "C-l" #'dired-find-file)
+
+;;; avy
+;; Use home-row keys for avy's selection overlay (faster to type)
+(setq avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+(setq avy-timeout-seconds 0.3)
+(map! :leader "j" #'avy-goto-char-timer)
+
+(setq display-line-numbers-type 'relative)
