@@ -86,7 +86,7 @@
 
 ;;; set font
 (add-to-list 'custom-theme-load-path (concat doom-user-dir "themes/"))
-(setq doom-theme 'doom-miramare)
+(setq doom-theme 'noctalia)
 
 (setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 16 :weight 'regular)
       doom-variable-pitch-font (font-spec :family "Liberation Sans" :size 13))
@@ -126,5 +126,37 @@
 (setq avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
 (setq avy-timeout-seconds 0.3)
 (map! :leader "j" #'avy-goto-char-timer)
+(map! :leader "k" #'avy-goto-line)
 
 (setq display-line-numbers-type 'relative)
+
+;;; move between windows with Alt hjkl
+(map! "M-h" #'evil-window-left
+      "M-j" #'evil-window-down
+      "M-k" #'evil-window-up
+      "M-l" #'evil-window-right)
+
+(after! evil
+  (defun my-evil-skip-buffers-advice (orig-fun &rest args)
+    "Force evil last buffer toggle to skip dired buffers."
+    (let ((prev-buffers (window-prev-buffers)))
+      (set-window-prev-buffers
+       nil
+       (cl-remove-if
+        (lambda (entry)
+          (let* ((buf (car entry))
+                 (name (buffer-name buf)))
+            (or (string-prefix-p " " name)
+                (with-current-buffer buf (derived-mode-p 'dired-mode)))))
+        prev-buffers))
+      (apply orig-fun args)))
+
+  (advice-add 'evil-switch-to-windows-last-buffer :around #'my-evil-skip-buffers-advice))
+
+;; keep this many screen lines above/below the cursor.
+(setq scroll-margin 4)
+
+;; add some spacing
+(add-to-list 'default-frame-alist '(internal-border-width . 10))
+
+;;; config ends here
