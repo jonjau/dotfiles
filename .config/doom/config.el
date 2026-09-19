@@ -168,7 +168,25 @@
       (cons 'eglot-project found)))
   (add-hook 'project-find-functions #'+project-try-tsconfig -100))
 
+;; copy line(s) as relative file-path and line-numbers
+(defun +copy-file-line-ref ()
+  "Copy \"path:line\" (normal) or \"path:start-end\" (visual) to kill ring and clipboard."
+  (interactive)
+  (let* ((path (if (buffer-file-name)
+                    (file-relative-name (buffer-file-name) (doom-project-root))
+                  (buffer-name)))
+         (value
+          (if (evil-visual-state-p)
+              (let ((start (line-number-at-pos (region-beginning)))
+                    (end (line-number-at-pos (region-end))))
+                (format "%s:%d-%d" path (min start end) (max start end)))
+            (format "%s:%d" path (line-number-at-pos)))))
+    (kill-new value)
+    (when (fboundp 'gui-set-selection) (gui-set-selection 'CLIPBOARD value))
+    (message "Copied: %s" value)))
 
+(map! :n "SPC f x" #'+copy-file-line-ref
+      :v "SPC f x" #'+copy-file-line-ref)
 
 
 ;;; config ends here
