@@ -111,7 +111,7 @@
    `(warning ((t (:foreground ,secondary))))
    `(error ((t (:foreground ,err))))
    `(match ((t (:background ,secondary-container :foreground ,on-secondary-container))))
-
+   
    ;; Font-lock
    `(font-lock-builtin-face ((t (:foreground ,primary))))
    `(font-lock-comment-face ((t (:foreground ,outline-color :slant italic))))
@@ -249,33 +249,7 @@
    `(dired-marked ((t (:foreground ,tertiary :weight bold))))
    `(dired-symlink ((t (:foreground ,secondary :slant italic))))
    `(dired-header ((t (:foreground ,primary :weight bold :height 1.1))))
-
-    ;; Diredfl (Doom's default dired face package — separate namespace from dired-*)
-   `(diredfl-dir-heading ((t (:foreground ,primary :weight bold :height 1.1))))
-   `(diredfl-dir-name ((t (:foreground ,primary :weight bold))))
-   `(diredfl-dir-priv ((t (:foreground ,primary))))
-   `(diredfl-file-name ((t (:foreground ,on-surface))))
-   `(diredfl-file-suffix ((t (:foreground ,on-surface-variant))))
-   `(diredfl-symlink ((t (:foreground ,secondary :slant italic))))
-   `(diredfl-number ((t (:foreground ,tertiary))))
-   `(diredfl-date-time ((t (:foreground ,outline-color))))
-   `(diredfl-deletion ((t (:foreground ,err :weight bold))))
-   `(diredfl-deletion-file-name ((t (:foreground ,err))))
-   `(diredfl-flag-mark ((t (:foreground ,tertiary :weight bold))))
-   `(diredfl-flag-mark-line ((t (:background ,tertiary-container))))
-   `(diredfl-ignored-file-name ((t (:foreground ,outline-variant))))
-   `(diredfl-compressed-file-suffix ((t (:foreground ,secondary))))
-   `(diredfl-compressed-file-name ((t (:foreground ,on-surface))))
-   `(diredfl-executable-tag ((t (:foreground ,tertiary))))
-   `(diredfl-read-priv ((t (:foreground ,primary))))
-   `(diredfl-write-priv ((t (:foreground ,secondary))))
-   `(diredfl-exec-priv ((t (:foreground ,tertiary))))
-   `(diredfl-no-priv ((t (:foreground ,outline-variant))))
-   `(diredfl-rare-priv ((t (:foreground ,err))))
-   `(diredfl-link-priv ((t (:foreground ,secondary))))
-   `(diredfl-other-priv ((t (:foreground ,outline-color))))
-   `(diredfl-tagged-autofile-name ((t (:foreground ,on-surface-variant))))
-
+   
    ;; Terminal colors
    `(term-color-black ((t (:foreground ,term0 :background ,term0))))
    `(term-color-red ((t (:foreground ,term1 :background ,term1))))
@@ -299,28 +273,7 @@
    `(eshell-ls-readonly ((t (:foreground ,on-surface-variant))))
    `(eshell-ls-special ((t (:foreground ,secondary-fixed))))
    `(eshell-ls-unreadable ((t (:foreground ,outline-variant))))
-
-   ;; Ghostel terminal colors
-   `(ghostel-default ((t (:foreground ,on-background :background ,bg))))
-   `(ghostel-color-black ((t (:foreground ,term0 :background ,term0))))
-   `(ghostel-color-red ((t (:foreground ,term1 :background ,term1))))
-   `(ghostel-color-green ((t (:foreground ,term2 :background ,term2))))
-   `(ghostel-color-yellow ((t (:foreground ,term3 :background ,term3))))
-   `(ghostel-color-blue ((t (:foreground ,term4 :background ,term4))))
-   `(ghostel-color-magenta ((t (:foreground ,term5 :background ,term5))))
-   `(ghostel-color-cyan ((t (:foreground ,term6 :background ,term6))))
-   `(ghostel-color-white ((t (:foreground ,term7 :background ,term7))))
-   `(ghostel-color-bright-black ((t (:foreground ,term8 :background ,term8))))
-   `(ghostel-color-bright-red ((t (:foreground ,term9 :background ,term9))))
-   `(ghostel-color-bright-green ((t (:foreground ,term10 :background ,term10))))
-   `(ghostel-color-bright-yellow ((t (:foreground ,term11 :background ,term11))))
-   `(ghostel-color-bright-blue ((t (:foreground ,term12 :background ,term12))))
-   `(ghostel-color-bright-magenta ((t (:foreground ,term13 :background ,term13))))
-   `(ghostel-color-bright-cyan ((t (:foreground ,term14 :background ,term14))))
-   `(ghostel-color-bright-white ((t (:foreground ,term15 :background ,term15))))
-   `(ghostel-fake-cursor ((t (:background ,primary))))
-   `(ghostel-fake-cursor-box ((t (:background ,primary :foreground ,bg))))
-
+   
    ;; Improved markdown mode
    `(markdown-header-face ((t (:foreground ,primary :weight bold))))
    `(markdown-header-face-1 ((t (:foreground ,primary :weight bold :height 1.2))))
