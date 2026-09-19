@@ -86,7 +86,7 @@
 
 ;;; set font
 (add-to-list 'custom-theme-load-path (concat doom-user-dir "themes/"))
-(setq doom-theme 'noctalia)
+(setq doom-theme 'forester)
 
 (setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 16 :weight 'regular)
       doom-variable-pitch-font (font-spec :family "Liberation Sans" :size 13))
@@ -150,7 +150,6 @@
                 (with-current-buffer buf (derived-mode-p 'dired-mode)))))
         prev-buffers))
       (apply orig-fun args)))
-
   (advice-add 'evil-switch-to-windows-last-buffer :around #'my-evil-skip-buffers-advice))
 
 ;; keep this many screen lines above/below the cursor.
@@ -158,5 +157,18 @@
 
 ;; add some spacing
 (add-to-list 'default-frame-alist '(internal-border-width . 10))
+
+;; custom project finder for typescript projects inside monorepo
+(with-eval-after-load 'project
+  (cl-defmethod project-root ((project (head eglot-project)))
+    (cdr project))
+  (defun +project-try-tsconfig (dir)
+    "Find the nearest ancestor directory containing tsconfig.json."
+    (when-let* ((found (locate-dominating-file dir "tsconfig.json")))
+      (cons 'eglot-project found)))
+  (add-hook 'project-find-functions #'+project-try-tsconfig -100))
+
+
+
 
 ;;; config ends here
