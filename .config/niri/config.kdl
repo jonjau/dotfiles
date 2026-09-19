@@ -655,6 +655,9 @@ binds {
     Mod+Y hotkey-overlay-title="Toggle window opacity rule" {
         toggle-window-rule-opacity;
     }
+    Mod+E hotkey-overlay-title="Open Emacs" {
+        spawn "emacs";
+    }
 }
 
 layer-rule {
