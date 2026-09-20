@@ -43,7 +43,7 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type 'relative)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -110,6 +110,7 @@
 
 ;;; dired like oil.nvim
 (map! :n "-" #'dired-jump
+      :n "C-S-h" #'dired-jump
       (:leader
        (:prefix-map ("o" . "open")
         :desc "Open path in dired" "o"
@@ -126,14 +127,6 @@
 (setq avy-timeout-seconds 0.3)
 (map! :leader "j" #'avy-goto-char-timer)
 (map! :leader "k" #'avy-goto-line)
-
-(setq display-line-numbers-type 'relative)
-
-;;; move between windows with Alt hjkl
-(map! "M-h" #'evil-window-left
-      "M-j" #'evil-window-down
-      "M-k" #'evil-window-up
-      "M-l" #'evil-window-right)
 
 (after! evil
   (defun my-evil-skip-buffers-advice (orig-fun &rest args)
@@ -187,5 +180,17 @@
 (map! :n "SPC f x" #'+copy-file-line-ref
       :v "SPC f x" #'+copy-file-line-ref)
 
+;; new or existing ghostel
+(defun my/ghostel-new ()
+  (interactive)
+  (ghostel '(4)))
+(map! :leader
+      :desc "New Ghostel instance"
+      "o t" #'my/ghostel-new
+      :desc "Ghostel"
+      "o T" #'ghostel)
+
+;; Alt+w for ace-window switcher
+(map! "M-w" #'ace-window)
 
 ;;; config ends here
