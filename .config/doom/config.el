@@ -88,8 +88,7 @@
 (add-to-list 'custom-theme-load-path (concat doom-user-dir "themes/"))
 (setq doom-theme 'forester)
 
-(setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 16 :weight 'regular)
-      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13))
+(setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 14 :weight 'regular))
 
 (defun doom-dashboard-draw-ascii-emacs-banner-fn ()
   (propertize
