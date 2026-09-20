@@ -89,7 +89,7 @@
 (setq doom-theme 'forester)
 
 (setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 16 :weight 'regular)
-      doom-variable-pitch-font (font-spec :family "Liberation Sans" :size 13))
+      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13))
 
 (defun doom-dashboard-draw-ascii-emacs-banner-fn ()
   (propertize
