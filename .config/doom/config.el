@@ -211,7 +211,7 @@
    (text-mode . denote-fontify-links-mode)
    (dired-mode . denote-dired-mode))
   :config
-  (setq denote-directory (expand-file-name "~/1-des/vault-v2/"))
+  (setq denote-directory (expand-file-name "~/1-des/notes/vault0"))
   (setq denote-file-type 'markdown-yaml)
   (setq denote-known-keywords '("wip" "des" "res" "zip"))
   (setq denote-save-buffers t)
