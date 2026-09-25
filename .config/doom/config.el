@@ -304,8 +304,7 @@
 
 (after! markdown-mode
   (setq markdown-split-window-direction 'right
-        markdown-live-preview-delete-export 'delete-on-export
-        markdown-command #'my-markdown-compile-gfm)
+        markdown-live-preview-delete-export 'delete-on-export)
   (map! :map markdown-mode-map
         :localleader
         :desc "Toggle live preview" "t p" #'markdown-live-preview-mode)
