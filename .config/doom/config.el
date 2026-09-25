@@ -224,7 +224,6 @@
   (denote-rename-buffer-mode 1))
 
 ;; Dired-specific commands, under the localleader (comma key by default)
-;; rather than global :map dired-mode-map + C-c C-d C-* chords
 (map! :map dired-mode-map
       :localleader
       (:prefix ("d" . "denote")
@@ -272,6 +271,14 @@
 (advice-add 'denote-rename-file :around #'my/denote-fix-links-after-rename)
 (advice-add 'denote-rename-file-using-front-matter :around #'my/denote-fix-links-after-rename)
 
+;; make denote-backlinks work with grep on raw obsidian-style markdown links
+(defun my/denote-backlinks-any-link-style ()
+  "Show backlinks to the current note via `denote-grep', so it works regardless of link style."
+  (interactive)
+  (if-let ((id (denote-retrieve-filename-identifier (buffer-file-name))))
+      (denote-grep id)
+    (user-error "Current buffer has no Denote identifier")))
+
 ;; Clear Doom's global SPC n prefix.
 (map! :leader "n" nil)
 ;; Re-create SPC n for Denote.
@@ -282,7 +289,7 @@
   :desc "Grep notes"                 "g" #'denote-grep
   :desc "Insert link"                "l" #'denote-link
   :desc "Insert multiple links"      "L" #'denote-add-links
-  :desc "Show backlinks"             "b" #'denote-backlinks
+  :desc "Show backlinks"             "b" #'my/denote-backlinks-any-link-style
   :desc "Query contents link"        "q c" #'denote-query-contents-link
   :desc "Query filenames link"       "q f" #'denote-query-filenames-link
   :desc "Rename file"                "r" #'denote-rename-file
@@ -297,12 +304,12 @@
 
 (after! markdown-mode
   (setq markdown-split-window-direction 'right
-        markdown-live-preview-delete-export 'delete-on-export)
+        markdown-live-preview-delete-export 'delete-on-export
+        markdown-command #'my-markdown-compile-gfm)
   (map! :map markdown-mode-map
         :localleader
         :desc "Toggle live preview" "t p" #'markdown-live-preview-mode)
   (map! :map markdown-mode-map
         :n "C-l" #'my-markdown-follow-link-other-window))
-
 
 ;; config ends here
