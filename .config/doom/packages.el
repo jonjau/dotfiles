@@ -54,3 +54,5 @@
 
 
 (package! avy)
+(package! denote)
+(package! denote-markdown)

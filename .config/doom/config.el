@@ -121,6 +121,14 @@
       :n "C-k" #'evil-previous-line
       :n "C-l" #'dired-find-file)
 
+;; dirvish
+(map! :leader
+      :desc "Dirvish"
+      "-" (cmd! (dirvish default-directory)))
+
+;; muscle memory
+(map! "C-s" #'save-buffer)
+
 ;;; avy
 ;; Use home-row keys for avy's selection overlay (faster to type)
 (setq avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
@@ -193,4 +201,108 @@
 ;; Alt+w for ace-window switcher
 (map! "M-w" #'ace-window)
 
-;;; config ends here
+(setq markdown-max-image-size '(500 . 500))
+
+(map! :leader "n" nil) ; clear Doom's default "notes" prefix entirely
+(use-package! denote
+  :hook
+  (;; markdown-mode derives from text-mode, so this hook fires for it too —
+   ;; no need for a separate markdown-mode-hook entry
+   (text-mode . denote-fontify-links-mode)
+   (dired-mode . denote-dired-mode))
+  :config
+  (setq denote-directory (expand-file-name "~/1-des/vault-v2/"))
+  (setq denote-file-type 'markdown-yaml)
+  (setq denote-known-keywords '("wip" "des" "res" "zip"))
+  (setq denote-save-buffers t)
+  (setq denote-prompts '(title keywords))
+  (setq denote-sort-dired-default-reverse-sort t)
+  (setq denote-excluded-directories-regexp nil)
+  (setq denote-keywords-to-not-infer-regexp nil)
+  (setq denote-rename-confirmations '(rewrite-front-matter modify-file-name))
+  (setq denote-date-prompt-use-org-read-date t)
+  (denote-rename-buffer-mode 1))
+
+;; Dired-specific commands, under the localleader (comma key by default)
+;; rather than global :map dired-mode-map + C-c C-d C-* chords
+(map! :map dired-mode-map
+      :localleader
+      (:prefix ("d" . "denote")
+       :desc "Link marked notes"                "i" #'denote-dired-link-marked-notes
+       :desc "Rename marked files"               "r" #'denote-dired-rename-files
+       :desc "Rename marked with keywords"       "k" #'denote-dired-rename-marked-files-with-keywords
+       :desc "Rename marked using front matter"  "R" #'denote-dired-rename-marked-files-using-front-matter))
+
+(use-package! denote-markdown
+  :after denote
+  :commands ( denote-markdown-convert-links-to-file-paths
+              denote-markdown-convert-links-to-denote-type
+              denote-markdown-convert-links-to-obsidian-type
+              denote-markdown-convert-obsidian-links-to-denote-type ))
+
+;; after denote-link, convert it to obsidian-style link
+(defun my/denote-link-obsidian-style (&rest _)
+  "Convert any :denote links in the buffer to Obsidian-style links."
+  (when (derived-mode-p 'markdown-mode)
+    (denote-markdown-convert-links-to-obsidian-type)))
+(advice-add 'denote-link :after #'my/denote-link-obsidian-style)
+(advice-add 'denote-add-links :after #'my/denote-link-obsidian-style)
+
+;; after denote-rename, replace all occurences of the old file name with the new file name
+(defun my/denote-fix-links-after-rename (orig-fun &rest args)
+  "Replace the old filename sans extension with the new one, across all .md files in denote-directory, revert any live buffers"
+  (let* ((old-base (file-name-sans-extension (file-name-nondirectory (car args))))
+         (new-path (apply orig-fun args)))
+    (when new-path
+      (let* ((new-base (file-name-sans-extension (file-name-nondirectory new-path)))
+             (sed-escape (lambda (str)
+                           (replace-regexp-in-string "[.*/\\^$[]" "\\\\\\&" str)))
+             (files (directory-files (denote-directory) t "\\.md\\'"))
+             (pattern (format "s/%s/%s/g"
+                               (funcall sed-escape old-base)
+                               (funcall sed-escape new-base))))
+        (when files
+          (apply #'call-process "sed" nil nil nil "-i" pattern files)
+          (dolist (file files)
+            (let ((buf (get-file-buffer file)))
+              (when buf
+                (with-current-buffer buf
+                  (revert-buffer t t t))))))))
+    new-path))
+(advice-add 'denote-rename-file :around #'my/denote-fix-links-after-rename)
+(advice-add 'denote-rename-file-using-front-matter :around #'my/denote-fix-links-after-rename)
+
+;; Clear Doom's global SPC n prefix.
+(map! :leader "n" nil)
+;; Re-create SPC n for Denote.
+(map! :leader
+  :prefix ("n" . "notes")
+  :desc "New note"                   "n" #'denote
+  :desc "Notes in Dired"             "d" #'denote-dired
+  :desc "Grep notes"                 "g" #'denote-grep
+  :desc "Insert link"                "l" #'denote-link
+  :desc "Insert multiple links"      "L" #'denote-add-links
+  :desc "Show backlinks"             "b" #'denote-backlinks
+  :desc "Query contents link"        "q c" #'denote-query-contents-link
+  :desc "Query filenames link"       "q f" #'denote-query-filenames-link
+  :desc "Rename file"                "r" #'denote-rename-file
+  :desc "Rename using front matter"  "R" #'denote-rename-file-using-front-matter)
+
+(defun my-markdown-follow-link-other-window ()
+  "Follow Markdown link at point in another window."
+  (interactive)
+  (let ((display-buffer-overriding-action
+         '((display-buffer-pop-up-window))))
+    (markdown-follow-thing-at-point nil)))
+
+(after! markdown-mode
+  (setq markdown-split-window-direction 'right
+        markdown-live-preview-delete-export 'delete-on-export)
+  (map! :map markdown-mode-map
+        :localleader
+        :desc "Toggle live preview" "t p" #'markdown-live-preview-mode)
+  (map! :map markdown-mode-map
+        :n "C-l" #'my-markdown-follow-link-other-window))
+
+
+;; config ends here
