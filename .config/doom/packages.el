@@ -56,3 +56,5 @@
 (package! avy)
 (package! denote)
 (package! denote-markdown)
+(package! nov)
+(package! visual-fill-column)

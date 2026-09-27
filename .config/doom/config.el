@@ -88,7 +88,8 @@
 (add-to-list 'custom-theme-load-path (concat doom-user-dir "themes/"))
 (setq doom-theme 'forester)
 
-(setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 14 :weight 'regular))
+(setq doom-font (font-spec :family "IosevkaTerm Nerd Font Mono" :size 14 :weight 'regular)
+      doom-variable-pitch-font (font-spec :family "Libre Baskerville" :size 14))
 
 (defun doom-dashboard-draw-ascii-emacs-banner-fn ()
   (propertize
@@ -310,5 +311,15 @@
         :desc "Toggle live preview" "t p" #'markdown-live-preview-mode)
   (map! :map markdown-mode-map
         :n "C-l" #'my-markdown-follow-link-other-window))
+
+(use-package! nov
+  :mode ("\\.epub\\'" . nov-mode)
+  :config
+  (setq nov-text-width t)  ; defer to visual-fill-column, don't hard-wrap
+  (setq visual-fill-column-center-text t)
+  (add-hook 'nov-mode-hook (lambda ()
+                              (setq fill-column 80)
+                              (visual-fill-column-mode 1)))
+  (add-hook 'nov-mode-hook 'visual-line-mode))
 
 ;; config ends here
