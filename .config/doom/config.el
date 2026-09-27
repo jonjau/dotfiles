@@ -318,8 +318,9 @@
   (setq nov-text-width t)  ; defer to visual-fill-column, don't hard-wrap
   (setq visual-fill-column-center-text t)
   (add-hook 'nov-mode-hook (lambda ()
-                              (setq fill-column 80)
-                              (visual-fill-column-mode 1)))
+                             (setq fill-column 80)
+                             (setq line-spacing 0.3)
+                             (visual-fill-column-mode 1)))
   (add-hook 'nov-mode-hook 'visual-line-mode))
 
 ;; config ends here
