@@ -304,7 +304,8 @@
     (markdown-follow-thing-at-point nil)))
 
 (after! markdown-mode
-  (setq markdown-split-window-direction 'right
+  (setq markdown-command "pandoc -f gfm -t html5"
+        markdown-split-window-direction 'right
         markdown-live-preview-delete-export 'delete-on-export)
   (map! :map markdown-mode-map
         :localleader
