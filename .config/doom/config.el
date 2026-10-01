@@ -109,6 +109,14 @@
    'face 'doom-dashboard-banner))
 (setq +dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn)
 
+;; always reload last session on startup
+(add-hook 'window-setup-hook
+          (lambda ()
+            (when (and (not noninteractive)
+                       (= (length command-line-args) 1)
+                       (file-exists-p (expand-file-name persp-auto-save-fname persp-save-dir)))
+              (doom/quickload-session t))))
+
 ;;; dired like oil.nvim
 (map! :n "-" #'dired-jump
       :n "C-S-h" #'dired-jump
