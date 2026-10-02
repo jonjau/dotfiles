@@ -35,8 +35,8 @@
       (on-surface-variant "#a2b08d")
       (on-tertiary "#f4f6eb")
       (on-tertiary-container "#e3e8e6")
-      (outline-color "#666961")
-      (outline-variant "#3f413c")
+      (outline-color "#938f7b")
+      (outline-variant "#6f7266")
       (primary "#a2b08d")
       (primary-container "#495a30")
       (secondary "#948e74")
@@ -124,7 +124,7 @@
    `(font-lock-type-face ((t (:foreground ,primary-fixed))))
    `(font-lock-variable-name-face ((t (:foreground ,on-surface))))
    `(font-lock-warning-face ((t (:foreground ,err :weight bold))))
-   `(font-lock-preprocessor-face ((t (:foreground ,secondary-fixed-dim))))
+   `(font-lock-preprocessor-face ((t (:foreground ,secondary))))
    `(font-lock-negation-char-face ((t (:foreground ,tertiary-fixed))))
 
    ;; Show paren
@@ -323,10 +323,12 @@
    
    ;; Improved markdown mode
    `(markdown-header-face ((t (:foreground ,primary :weight bold))))
-   `(markdown-header-face-1 ((t (:foreground ,primary :weight bold :height 1.2))))
-   `(markdown-header-face-2 ((t (:foreground ,primary-container :weight bold :height 1.1))))
+   `(markdown-header-face-1 ((t (:foreground ,term10 :weight bold :height 1.2))))
+   `(markdown-header-face-2 ((t (:foreground ,primary :weight bold :height 1.1))))
    `(markdown-header-face-3 ((t (:foreground ,secondary :weight bold))))
-   `(markdown-header-face-4 ((t (:foreground ,secondary-container :weight bold))))
+   `(markdown-header-face-4 ((t (:foreground ,term6 :weight bold))))
+   `(markdown-header-face-5 ((t (:foreground ,tertiary :weight bold))))
+   `(markdown-header-face-6 ((t (:foreground ,outline-color :weight bold))))
    `(markdown-inline-code-face ((t (:foreground ,tertiary-fixed :background ,surface-container-low :inherit fixed-pitch))))
    `(markdown-code-face ((t (:background ,surface-container-low :extend t :inherit fixed-pitch))))
    `(markdown-pre-face ((t (:background ,surface-container-low :inherit fixed-pitch))))
@@ -359,9 +361,9 @@
    
    ;; Info and help modes
    `(info-title-1 ((t (:foreground ,primary :weight bold :height 1.3))))
-   `(info-title-2 ((t (:foreground ,primary-container :weight bold :height 1.2))))
+   `(info-title-2 ((t (:foreground ,primary :weight bold :height 1.2))))
    `(info-title-3 ((t (:foreground ,secondary :weight bold :height 1.1))))
-   `(info-title-4 ((t (:foreground ,secondary-container :weight bold))))
+   `(info-title-4 ((t (:foreground ,term6 :weight bold))))
    `(Info-quoted ((t (:foreground ,tertiary))))
    `(info-menu-header ((t (:foreground ,primary :weight bold))))
    `(info-menu-star ((t (:foreground ,primary))))
