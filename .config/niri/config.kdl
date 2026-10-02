@@ -652,6 +652,9 @@ binds {
     Mod+F2 hotkey-overlay-title="Open files: Nautilus" {
         spawn "nautilus";
     }
+    Mod+F4 hotkey-overlay-title="Start fcitx5-daemon" {
+        spawn "fcitx5" "-d"
+    }
     Mod+Y hotkey-overlay-title="Toggle window opacity rule" {
         toggle-window-rule-opacity;
     }
