@@ -137,6 +137,9 @@
 
 ;; muscle memory
 (map! "C-s" #'save-buffer)
+(map! :n "C-f" #'isearch-forward)
+(after! isearch
+  (define-key isearch-mode-map (kbd "C-f") #'isearch-repeat-forward))
 
 ;;; avy
 ;; Use home-row keys for avy's selection overlay (faster to type)
@@ -331,5 +334,13 @@
                              (setq line-spacing 0.3)
                              (visual-fill-column-mode 1)))
   (add-hook 'nov-mode-hook 'visual-line-mode))
+
+(use-package! pyim
+  :config
+  (require 'pyim-basedict)
+  (pyim-basedict-enable)
+  (pyim-isearch-mode 1)
+  (setq default-input-method "pyim")
+  (setq pyim-default-scheme 'quanpin)) ; full Pinyin, as opposed to abbreviated schemes
 
 ;; config ends here

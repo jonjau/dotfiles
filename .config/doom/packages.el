@@ -58,3 +58,5 @@
 (package! denote-markdown)
 (package! nov)
 (package! visual-fill-column)
+(package! pyim)
+(package! pyim-basedict)
